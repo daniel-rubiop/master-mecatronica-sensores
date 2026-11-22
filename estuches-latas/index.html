@@ -3,140 +3,152 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Estación de inspección G4</title>
+<title>Estación de inspección de estuches</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="description" content="Simulador 3D de una estación de inspección de estuches de latas de conserva.">
 <style>
-/* Disposición: cabecera técnica compacta + visor 3D a todo el ancho + paneles de estado debajo */
+/* Propuesta B · Panel técnico claro: barra superior azul marino, barra lateral de controles y visor grande con tarjetas debajo.
+   Colores de la memoria: azul marino #1F3864, azul #2E75B6, gris #595959, texto #1A1A1A, Arial. */
 :root{
-  --bg:#f3f5f8; --surface:#ffffff; --ink:#18212b; --ink2:#53606e; --line:#d6dce4; --soft:#eaeef3;
-  --accent:#0f4c81; --accent-ink:#ffffff; --pend:#c81e1e; --ok:#15803d; --nok:#b91c1c;
-  --c-trig:#64748b; --c-r1:#2563eb; --c-r7:#7c3aed; --c-r2:#ea580c; --c-r3:#16a34a; --c-r5:#0891b2; --c-r8:#db2777; --c-rej:#dc2626;
-  --f-ui: system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
-  --f-mono: ui-monospace,"Cascadia Code",Consolas,monospace;
+  --navy:#1F3864; --blue:#2E75B6; --grey:#595959; --ink:#1A1A1A; --bg:#EEF2F7; --card:#FFFFFF; --line:#C9D3E0; --line2:#E2E7EE;
+  --sky:#BFD4EC; --ok:#1E7B45; --nok:#A82B2B; --nok-bg:#FDF4F4; --nok-line:#D9A3A3;
+  --c-trig:#6B7A8C; --c-r1:#2E75B6; --c-r7:#5B4B8A; --c-r2:#D97706; --c-r3:#1B8A8A; --c-r5:#1F3864; --c-r8:#A23B72; --c-rej:#A82B2B;
+  --f:Arial,Helvetica,sans-serif; --mono:Consolas,"Cascadia Code",monospace;
+  color-scheme:light;
 }
-@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --bg:#0f141a; --surface:#161d25; --ink:#e4ebf2; --ink2:#9aa9b8; --line:#2a3542; --soft:#1e2731; --accent:#5aa2e0; --accent-ink:#0b1520; --pend:#f05252; --ok:#4ade80; --nok:#f87171; color-scheme:dark } }
-:root[data-theme="dark"]{ --bg:#0f141a; --surface:#161d25; --ink:#e4ebf2; --ink2:#9aa9b8; --line:#2a3542; --soft:#1e2731; --accent:#5aa2e0; --accent-ink:#0b1520; --pend:#f05252; --ok:#4ade80; --nok:#f87171; color-scheme:dark }
 *{box-sizing:border-box}
 html,body{background:var(--bg)}
-body{margin:0;color:var(--ink);font:15px/1.55 var(--f-ui);padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:20px 40px}
-.wrap{max-width:1320px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
-header.top{display:flex;flex-wrap:wrap;gap:12px 28px;align-items:flex-end;justify-content:space-between}
-header.top .eyebrow{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink2)}
-header.top h1{margin:4px 0 2px;font-size:clamp(22px,3vw,30px);line-height:1.15;text-wrap:balance}
-header.top p{margin:0;color:var(--ink2);max-width:68ch}
-.facts{display:flex;flex-wrap:wrap;gap:8px}
-.fact{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:13px;font-variant-numeric:tabular-nums}
-.fact b{display:block;font-size:15px}
-.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12.5px;color:var(--ink2)}
-.legend span{display:inline-flex;align-items:center;gap:6px}
-.sw{width:12px;height:12px;border-radius:3px;display:inline-block;vertical-align:middle}
-.pend{display:inline-block;background:var(--pend);color:#fff;font-weight:800;font-size:11px;letter-spacing:.04em;padding:0 6px;border-radius:4px;white-space:nowrap}
-.viewer-wrap{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden;min-width:0}
-.viewer-bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:9px 12px;border-bottom:1px solid var(--line);background:var(--soft)}
-.viewer-bar .grp{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding-right:10px;margin-right:4px;border-right:1px solid var(--line)}
-.viewer-bar .grp:last-child{border-right:0}
-.viewer-bar label.t{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink2);margin-right:2px}
-.rt{font-size:12px;min-width:64px;font-variant-numeric:tabular-nums}
-.chk{font-size:12.5px;display:inline-flex;gap:4px;align-items:center}
-button.b{font:inherit;font-size:13px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:7px;padding:4px 10px;cursor:pointer}
-button.b:hover{border-color:var(--accent)}
-button.b:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-button.b.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
-button.b.def{color:var(--nok)}
-button.b.def.on{background:var(--nok);color:#fff;border-color:var(--nok)}
-input[type=range]{vertical-align:middle;width:104px;accent-color:var(--accent)}
-#viewer3d{position:relative;height:min(72vh,780px);min-height:420px;background:#e9eef3}
+body{margin:0;color:var(--ink);font:14px/1.5 var(--f)}
+.topbar{background:var(--navy);color:#fff;border-bottom:3px solid var(--blue)}
+.topbar .inner{max-width:1440px;margin:0 auto;padding:14px max(16px,env(safe-area-inset-left,0px));display:flex;flex-wrap:wrap;gap:8px 24px;align-items:center;justify-content:space-between}
+.topbar .eyebrow{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--sky)}
+.topbar h1{margin:2px 0 0;font-size:20px;font-weight:700;text-wrap:balance}
+.facts{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13px;color:#DCE7F4;font-variant-numeric:tabular-nums}
+.facts b{color:#fff}
+.shell{max-width:1440px;margin:0 auto;padding:20px max(16px,env(safe-area-inset-left,0px)) 32px;display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start}
+.side{flex:1 1 270px;max-width:310px;min-width:0;background:var(--card);border:1px solid var(--line)}
+.side section{padding:14px 16px;border-bottom:1px solid var(--line2);display:flex;flex-direction:column;gap:9px}
+.side section:last-child{border-bottom:0}
+.sec{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--blue);font-weight:700}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.rt{font-variant-numeric:tabular-nums}
+label.sl{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--grey)}
+label.sl span{display:flex;justify-content:space-between}
+input[type=range]{width:100%;accent-color:var(--blue)}
+.defs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.chk{display:flex;gap:6px;align-items:center;font-size:12px;color:var(--grey)}
+.seg{display:flex;border:1px solid var(--navy);border-radius:4px;overflow:hidden}
+.seg button.b{flex:1;border:0;border-radius:0;background:#fff;color:var(--navy)}
+.seg button.b.on{background:var(--navy);color:#fff}
+button.b{font:inherit;font-size:13px;border:1px solid var(--line);background:#fff;color:var(--navy);border-radius:4px;padding:7px 12px;cursor:pointer;min-height:34px}
+button.b:hover{border-color:var(--blue)}
+button.b.on{background:var(--navy);border-color:var(--navy);color:#fff}
+button.b:focus-visible,input:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+#btnPlay{border:0;background:var(--navy);color:#fff}
+#btnPlay:not(.on){background:var(--blue)}
+button.b.def{background:var(--nok-bg);border-color:var(--nok-line);color:var(--nok)}
+button.b.def.on{background:var(--nok);border-color:var(--nok);color:#fff}
+.layers{display:flex;flex-direction:column;gap:6px;font-size:13px}
+.layers label{display:flex;gap:8px;align-items:center;cursor:pointer}
+.sw{width:11px;height:11px;display:inline-block;flex:none}
+.main{flex:999 1 640px;min-width:0;display:flex;flex-direction:column;gap:14px}
+.card{background:var(--card);border:1px solid var(--line)}
+.vbar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:10px 12px;border-bottom:1px solid var(--line2)}
+#phaseBar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;flex:1 1 420px;min-width:0}
+#phaseBar button.b{border-radius:999px;padding:5px 11px;min-height:30px}
+.vtools{display:flex;gap:6px;flex-wrap:wrap}
+#viewer3d{position:relative;height:min(68vh,720px);min-height:420px;background:#fff}
 #viewer3d canvas{display:block;touch-action:none}
-.noscript{padding:20px;color:#7a1010}
-.lbl{font:600 11px/1.2 var(--f-ui);background:rgba(255,255,255,.93);border:1px solid #c9d1db;border-left:4px solid var(--c,#334155);padding:2px 6px;border-radius:4px;color:#1b2430;white-space:nowrap;pointer-events:none}
-.viewer-side{display:grid;grid-template-columns:1.4fr 1fr 1fr;border-top:1px solid var(--line)}
-.viewer-side>div{padding:12px 14px;border-right:1px solid var(--line);font-size:13.5px;min-height:150px;min-width:0}
-.viewer-side>div:last-child{border-right:0}
-.viewer-side h4{margin:0 0 6px;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink2)}
-#counters table{border-collapse:collapse;width:100%;font-size:12.5px;font-variant-numeric:tabular-nums}
-#counters td{padding:2px 6px;border-bottom:1px solid var(--line)}
-#counters td.n{text-align:right}
-#log{font-family:var(--f-mono);font-size:12px;max-height:150px;overflow:auto;margin:0;padding:0;list-style:none}
-#log li{padding:1px 0;border-bottom:1px dotted var(--line)}
+.noscript{padding:20px;color:var(--nok)}
+.lbl{font:600 11px/1.2 var(--f);background:rgba(255,255,255,.95);border:1px solid var(--line);border-left:4px solid var(--c,#334155);padding:2px 6px;border-radius:2px;color:var(--ink);white-space:nowrap;pointer-events:none}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.kpi{background:var(--card);border:1px solid var(--line);border-top:3px solid var(--navy);padding:10px 14px;font-variant-numeric:tabular-nums}
+.kpi .kl{font-size:12px;color:var(--grey)}
+.kpi .kv{font-size:24px;font-weight:700;color:var(--navy)}
+.kpi.k-ok{border-top-color:var(--ok)} .kpi.k-ok .kv{color:var(--ok)}
+.kpi.k-nok{border-top-color:var(--nok)} .kpi.k-nok .kv{color:var(--nok)}
+.kpi.k-blue{border-top-color:var(--blue)} .kpi.k-blue .kv{color:var(--blue)}
+.kdet{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12.5px;color:var(--grey);padding:2px 2px 0}
+.kdet b{color:var(--ink)}
+.row2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
+.pad{padding:12px 14px;display:flex;flex-direction:column;gap:6px;min-width:0}
+#phaseText{font-size:14px}
+#phaseText b{color:var(--navy)}
+#phaseText .pend{display:inline-block;background:var(--nok);color:#fff;font-weight:700;font-size:11px;padding:0 6px;border-radius:3px}
+#log{font-family:var(--mono);font-size:12px;max-height:150px;overflow:auto;margin:0;padding:0;list-style:none}
+#log li{padding:2px 0;border-bottom:1px dotted var(--line2)}
 #log .nok{color:var(--nok);font-weight:700}
-#log .okk{color:var(--ok)}
-.layers{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:12.5px}
-.layers label{display:inline-flex;gap:4px;align-items:center;cursor:pointer}
-.howto{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
-.howto div{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:13.5px;min-width:0}
-.howto b{display:block;margin-bottom:2px}
-footer{font-size:12.5px;color:var(--ink2)}
-:fullscreen #viewer3d{height:calc(100vh - 150px)}
-@media (max-width:900px){ .viewer-side,.howto{grid-template-columns:1fr} #viewer3d{height:62vh} }
+#log .okk{color:var(--ok);font-weight:700}
+.foot{margin:0;font-size:12px;color:var(--grey)}
+:fullscreen{background:var(--card)}
+:fullscreen #viewer3d{height:calc(100vh - 60px)}
+@media (max-width:760px){ .side{max-width:none} .main{order:-1} .kpis{grid-template-columns:repeat(2,minmax(0,1fr))} #viewer3d{height:60vh} }
 @media (prefers-reduced-motion: reduce){ *{scroll-behavior:auto} }
 </style>
 </head>
 <body>
-<div class="wrap">
-<header class="top">
-  <div>
-    <div class="eyebrow">Sensores y actuadores · Simulador 3D</div>
-    <h1>Estación de inspección de estuches de sardinas</h1>
-    <p>Modelo 3D a escala (mm) de la estación que verifica en línea estuches de latas de conserva de dos clientes: hay lata, la lata no es corta, tiene tapa, las solapas están pegadas, cliente y formato correctos. Elige una fase o provoca un defecto para ver qué sensor lo detecta.</p>
-  </div>
-  <div class="facts">
-    <div class="fact"><b>110 × 65 × 25</b>estuche (mm)</div>
-    <div class="fact"><b>106 × 63 × 24</b>lata (mm)</div>
-    <div class="fact"><b>150 est/min</b>0,30 m/s · paso 120</div>
-    <div class="fact"><b>8 sensores</b>en ≈ 450 mm</div>
+<header class="topbar">
+  <div class="inner">
+    <div>
+      <span class="eyebrow">Simulador 3D · Trabajo de selección de sensórica</span>
+      <h1>Estación de inspección de estuches</h1>
+    </div>
+    <div class="facts">
+      <span><b>110 × 65 × 25</b> mm estuche</span>
+      <span><b>106 × 63 × 24</b> mm lata</span>
+      <span><b>150</b> est/min</span>
+      <span><b>8</b> sensores</span>
+    </div>
   </div>
 </header>
-<div class="legend">
-  <span><i class="sw" style="background:var(--c-trig)"></i>Disparo E3FA</span>
-  <span><i class="sw" style="background:var(--c-r1)"></i>R1+R6 inductivos inferiores</span>
-  <span><i class="sw" style="background:var(--c-r7)"></i>R7 inductivo de tapa</span>
-  <span><i class="sw" style="background:var(--c-r2)"></i>R2 láseres de solapas</span>
-  <span><i class="sw" style="background:var(--c-r3)"></i>R3 color</span>
-  <span><i class="sw" style="background:var(--c-r5)"></i>R5 lector EAN</span>
-  <span><i class="sw" style="background:var(--c-r8)"></i>R8 opciones <span class="pend">P12</span></span>
-  <span><i class="sw" style="background:var(--c-rej)"></i>Rechazo <span class="pend">P15</span></span>
-</div>
-<div class="viewer-wrap">
-  <div class="viewer-bar">
-    <div class="grp"><label class="t">Simulación</label>
-      <button class="b on" id="btnPlay">⏸ Pausa</button>
-      <label class="t" for="spd">vel.</label><input type="range" id="spd" min="0.05" max="1" step="0.05" value="0.3"><span id="spdTxt" class="rt">0,30 m/s</span>
-      <label class="t" for="tsc">cámara lenta</label><input type="range" id="tsc" min="0.05" max="1" step="0.05" value="0.35"><span id="tscTxt" class="rt">×0,35</span>
+<div class="shell">
+  <aside class="side" aria-label="Controles de la simulación">
+    <section>
+      <span class="sec">Simulación</span>
+      <div class="row"><button class="b on" id="btnPlay">⏸ Pausa</button><span id="spdTxt" class="rt">0,30 m/s</span></div>
+      <label class="sl" for="spd"><span>Velocidad de cinta</span><input type="range" id="spd" min="0.05" max="1" step="0.05" value="0.3"></label>
+      <label class="sl" for="tsc"><span>Cámara lenta <b id="tscTxt" class="rt">×0,35</b></span><input type="range" id="tsc" min="0.05" max="1" step="0.05" value="0.35"></label>
+    </section>
+    <section>
+      <span class="sec">Provocar defecto</span>
+      <div class="defs">
+        <button class="b def" data-def="sin_lata">Sin lata</button>
+        <button class="b def" data-def="lata_corta">Lata corta</button>
+        <button class="b def" data-def="sin_tapa">Sin tapa</button>
+        <button class="b def" data-def="solapa">Solapa</button>
+        <button class="b def" data-def="cliente">Cliente erróneo</button>
+        <label class="chk"><input type="checkbox" id="rnd"> Aleatorio (15 %)</label>
+      </div>
+    </section>
+    <section>
+      <span class="sec">Orden activa</span>
+      <div class="seg"><button class="b on" data-order="CLI_A">Cliente A</button><button class="b" data-order="CLI_B">Cliente B</button></div>
+    </section>
+    <section>
+      <span class="sec">Capas</span>
+      <div class="layers" id="layers"></div>
+    </section>
+  </aside>
+  <main class="main">
+    <div class="card">
+      <div class="vbar">
+        <div id="phaseBar" aria-label="Fases"></div>
+        <div class="vtools">
+          <button class="b" id="btnXray">Rayos X</button>
+          <button class="b" id="btnExplode">Explosionada</button>
+          <button class="b" id="btnLabels">Etiquetas</button>
+          <button class="b" id="btnFull" aria-label="Pantalla completa">⤢</button>
+        </div>
+      </div>
+      <div id="viewer3d"><div class="noscript" id="noThree">Cargando el modelo 3D…</div></div>
     </div>
-    <div class="grp"><label class="t">Inyectar defecto</label>
-      <button class="b def" data-def="sin_lata">Sin lata</button>
-      <button class="b def" data-def="lata_corta">Lata corta</button>
-      <button class="b def" data-def="sin_tapa">Sin tapa</button>
-      <button class="b def" data-def="solapa">Solapa levantada</button>
-      <button class="b def" data-def="cliente">Cliente erróneo</button>
-      <label class="chk"><input type="checkbox" id="rnd"> aleatorio (15 %)</label>
+    <div class="kpis" id="counters"></div>
+    <div class="row2">
+      <div class="card pad"><span class="sec">Fase actual</span><div id="phaseText">Vista general de la estación.</div></div>
+      <div class="card pad"><span class="sec">Registro</span><ul id="log"></ul></div>
     </div>
-    <div class="grp"><label class="t">Orden activa</label>
-      <button class="b on" data-order="ALVA">Cliente A</button><button class="b" data-order="CALVO">Cliente B</button>
-    </div>
-    <div class="grp"><label class="t">Vista</label>
-      <button class="b" id="btnXray">Rayos X</button>
-      <button class="b" id="btnExplode">Vista explosionada</button>
-      <button class="b" id="btnLabels">Etiquetas</button>
-      <button class="b" id="btnFull" aria-label="Pantalla completa">⤢</button>
-    </div>
-  </div>
-  <div class="viewer-bar" id="phaseBar"><label class="t">Fases</label></div>
-  <div id="viewer3d"><div class="noscript" id="noThree">Cargando el modelo 3D…</div></div>
-  <div class="viewer-side">
-    <div><h4>Fase actual</h4><div id="phaseText">Vista general de la estación.</div></div>
-    <div><h4>Contadores</h4><div id="counters"></div></div>
-    <div><h4>Registro</h4><ul id="log"></ul><h4 style="margin-top:8px">Capas</h4><div class="layers" id="layers"></div></div>
-  </div>
-</div>
-<div class="howto">
-  <div><b>Girar y acercar</b>Arrastra para girar, rueda o pellizco para zoom, botón derecho o dos dedos para desplazar.</div>
-  <div><b>Fases</b>Recorren la estación paso a paso y resaltan el sensor activo con su zona de detección.</div>
-  <div><b>Defectos</b>El siguiente estuche lleva el defecto elegido. Mira el LED del sensor, el rechazo y los contadores.</div>
-  <div><b>Rayos X y explosionada</b>Muestran la lata dentro del estuche y todos los sensores alrededor de un único estuche.</div>
-</div>
-<footer>Datos con las medidas reales de la muestra (22/11/2026). Material de la lata pendiente de confirmar (se supone aluminio). Three.js r128 (MIT).</footer>
+    <p class="foot">Arrastra para girar, rueda o pellizco para acercar, botón derecho o dos dedos para desplazar. Medidas reales de la muestra; material de la lata pendiente de confirmar (se supone aluminio). Three.js r128 (MIT).</p>
+  </main>
 </div>
 
 <script>
@@ -1395,7 +1407,7 @@ footer{font-size:12.5px;color:var(--ink2)}
 </script>
 <script>
 /* =====================================================================
-   Grupo 4 — Estuches y latas de conserva
+   Estuches y latas de conserva
    Modelo 3D interactivo de la estación de inspección (Three.js r128)
    Unidades: mm. Coordenadas del documento: X = avance, Y = transversal,
    Z = vertical (Z = 0 en la superficie de la banda).
@@ -1413,13 +1425,14 @@ footer{font-size:12.5px;color:var(--ink2)}
   if (noThree) noThree.remove();
 
   /* ---------- colores por requisito (iguales que en el CSS) ---------- */
-  var COL = { trig: 0x64748b, r1: 0x2563eb, r7: 0x7c3aed, r2: 0xea580c, r3: 0x16a34a, r5: 0x0891b2, r8: 0xdb2777, rej: 0xdc2626, cinta: 0x475569, guias: 0xca8a04, cotas: 0x334155, explode: 0x0f4c81 };
+  // Paleta de la memoria: azul marino 1F3864, azul 2E75B6, gris 595959 + tonos sobrios por requisito
+  var COL = { trig: 0x6b7a8c, r1: 0x2e75b6, r7: 0x5b4b8a, r2: 0xd97706, r3: 0x1b8a8a, r5: 0x1f3864, r8: 0xa23b72, rej: 0xa82b2b, cinta: 0x3a4756, guias: 0xb8a04a, cotas: 0x595959, explode: 0x1f3864 };
   var hex = function (c) { return '#' + ('000000' + c.toString(16)).slice(-6); };
   var V = function (X, Y, Z) { return new THREE.Vector3(X, Z, Y); };
 
   /* ---------- escena ---------- */
   var scene = new THREE.Scene();
-  scene.background = new THREE.Color(0xe9eef3);
+  scene.background = new THREE.Color(0xffffff);
   var camera = new THREE.PerspectiveCamera(32, 1, 1, 20000);
   var renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
@@ -1449,8 +1462,9 @@ footer{font-size:12.5px;color:var(--ink2)}
   scene.add(sun, sun.target);
   var fill = new THREE.DirectionalLight(0xffffff, 0.25); fill.position.copy(V(-400, -600, 300)); scene.add(fill);
 
-  var floor = new THREE.Mesh(new THREE.PlaneGeometry(6000, 6000), new THREE.MeshStandardMaterial({ color: 0xdde3ea, roughness: 1 }));
+  var floor = new THREE.Mesh(new THREE.PlaneGeometry(6000, 6000), new THREE.MeshStandardMaterial({ color: 0xf4f7fa, roughness: 1 }));
   floor.rotation.x = -Math.PI / 2; floor.position.y = -760; floor.receiveShadow = true; scene.add(floor);
+  var grid = new THREE.GridHelper(6000, 120, 0xd5dee9, 0xe6ecf3); grid.position.y = -759; scene.add(grid);
 
   /* ---------- utilidades ---------- */
   function mat(c, o) { return new THREE.MeshStandardMaterial(Object.assign({ color: c, roughness: 0.6, metalness: 0.1 }, o || {})); }
@@ -1554,7 +1568,7 @@ footer{font-size:12.5px;color:var(--ink2)}
   function makeTop(client) {
     var c = canvasFor(650, 1100), x = c.getContext('2d');
     x.translate(650, 0); x.rotate(Math.PI / 2); // coordenadas del diseño: 1100 (ancho) × 650 (alto); borde superior del diseño → +X
-    if (client === 'ALVA') {
+    if (client === 'CLI_A') {
       x.fillStyle = '#ffffff'; x.fillRect(0, 0, 1100, 650);
       waves(x, 1100, 20, 470, '#c7ccd2');
       x.fillStyle = '#e8573f'; x.beginPath(); x.moveTo(0, 470); for (var i = 0; i <= 1100; i += 10) x.lineTo(i, 470 + Math.sin(i / 40) * 10); x.lineTo(1100, 650); x.lineTo(0, 650); x.fill();
@@ -1577,7 +1591,7 @@ footer{font-size:12.5px;color:var(--ink2)}
   }
   function makeBase(client) { // cara -y: arriba del canvas = +Y, izquierda = -X
     var c = canvasFor(650, 1100), x = c.getContext('2d');
-    x.fillStyle = client === 'ALVA' ? '#f4a48c' : '#d8323b'; x.fillRect(0, 0, 650, 1100);
+    x.fillStyle = client === 'CLI_A' ? '#f4a48c' : '#d8323b'; x.fillRect(0, 0, 650, 1100);
     x.fillStyle = 'rgba(40,20,20,.55)'; for (var r = 0; r < 14; r++) x.fillRect(330, 120 + r * 34, 260, 10);
     // EAN-13: Y −50…−16, X −27,5…−9,5  → filas 710–1050, columnas 50–230
     x.fillStyle = '#fff'; x.fillRect(50, 710, 180, 340);
@@ -1586,21 +1600,21 @@ footer{font-size:12.5px;color:var(--ink2)}
   }
   function makeSide(client) { // laterales largos (110 × 25)
     var c = canvasFor(1100, 250), x = c.getContext('2d');
-    x.fillStyle = client === 'ALVA' ? '#e8573f' : '#e3101c'; x.fillRect(0, 0, 1100, 250);
-    x.fillStyle = '#fff'; x.font = '900 70px "Arial Black", Arial'; x.textAlign = 'left'; x.fillText(client === 'ALVA' ? 'CLIENTE A' : 'Cliente B', 80, 110);
-    x.font = 'bold 44px Arial'; x.fillText(client === 'ALVA' ? 'SARDINAS “Sardinillas”' : 'Sardinas en salsa', 480, 120);
+    x.fillStyle = client === 'CLI_A' ? '#e8573f' : '#e3101c'; x.fillRect(0, 0, 1100, 250);
+    x.fillStyle = '#fff'; x.font = '900 70px "Arial Black", Arial'; x.textAlign = 'left'; x.fillText(client === 'CLI_A' ? 'CLIENTE A' : 'Cliente B', 80, 110);
+    x.font = 'bold 44px Arial'; x.fillText(client === 'CLI_A' ? 'SARDINAS “Sardinillas”' : 'Sardinas en salsa', 480, 120);
     var t = new THREE.CanvasTexture(c); t.anisotropy = 4; return t;
   }
   function makeFlap(client, lote) { // solapa visible (63 × 23): bisagra arriba
     var c = canvasFor(630, 230), x = c.getContext('2d');
     x.fillStyle = '#ffffff'; x.fillRect(0, 0, 630, 70);
-    x.fillStyle = client === 'ALVA' ? '#e8573f' : '#e3101c'; x.fillRect(0, 70, 630, 160);
+    x.fillStyle = client === 'CLI_A' ? '#e8573f' : '#e3101c'; x.fillRect(0, 70, 630, 160);
     x.fillStyle = '#16264f'; x.font = 'bold 26px Arial'; x.textAlign = 'center'; x.fillText('SARDINAS “Sardinillas” en Tomate', 315, 45);
     if (lote) { x.fillStyle = '#111'; x.font = 'bold 30px monospace'; x.fillText('P L26/2233 028 29169', 315, 140); x.fillText('BB: 30.06.2031', 315, 180); }
     var t = new THREE.CanvasTexture(c); t.anisotropy = 4; return t;
   }
   var TEX = {};
-  ['ALVA', 'CALVO'].forEach(function (k) { TEX[k] = { top: makeTop(k), base: makeBase(k), side: makeSide(k), flap: makeFlap(k, true), flapPlain: makeFlap(k, false) }; });
+  ['CLI_A', 'CLI_B'].forEach(function (k) { TEX[k] = { top: makeTop(k), base: makeBase(k), side: makeSide(k), flap: makeFlap(k, true), flapPlain: makeFlap(k, false) }; });
   var xray = false;
   var estucheMats = [];
 
@@ -1780,7 +1794,7 @@ footer{font-size:12.5px;color:var(--ink2)}
   function part(obj, base, off) { obj.position.copy(base); gE.add(obj); parts.push({ o: obj, b: base.clone(), d: off }); return obj; }
   rigBuilding = true;
   (function buildRig() {
-    var T = TEX.ALVA;
+    var T = TEX.CLI_A;
     var shellMats = [texMat(T.side), texMat(T.side), texMat(T.top), texMat(T.base), mat(0xead6b4), mat(0xead6b4)];
     shellMats.forEach(function (m) { m.transparent = true; m.opacity = 0.6; });
     var shell = new THREE.Mesh(new THREE.BoxGeometry(EST.x, EST.z, EST.y), shellMats);
@@ -1817,7 +1831,7 @@ footer{font-size:12.5px;color:var(--ink2)}
   var speed = 0.3;          // m/s reales de la cinta
   var timeScale = 0.35;     // cámara lenta
   var playing = true;
-  var order = 'ALVA';
+  var order = 'CLI_A';
   var pendingDef = null;
   var randomDef = false;
   var items = [];
@@ -1832,7 +1846,7 @@ footer{font-size:12.5px;color:var(--ink2)}
       if (pendingDef) { def = pendingDef; pendingDef = null; markDefBtn(null); }
       else if (randomDef && Math.random() < 0.15) { var k = Object.keys(DEF_TXT); def = k[Math.floor(Math.random() * k.length)]; }
     }
-    var client = def === 'cliente' ? (order === 'ALVA' ? 'CALVO' : 'ALVA') : order;
+    var client = def === 'cliente' ? (order === 'CLI_A' ? 'CLI_B' : 'CLI_A') : order;
     var g = makeEstuche({ client: client, can: def === 'sin_lata' ? 'none' : (def === 'lata_corta' ? 'short' : 'ok'), lid: def !== 'sin_tapa', flap: def === 'solapa' });
     g.position.copy(V(x, 0, 0));
     gItems.add(g);
@@ -1905,13 +1919,16 @@ footer{font-size:12.5px;color:var(--ink2)}
     if (ok) counters.ok++; else it.defs.forEach(function (d) { counters[d]++; });
     renderCounters();
     var li = document.createElement('li');
-    li.innerHTML = ok ? '<span class="okk">OK</span> · ' + (it.client === 'ALVA' ? 'Cliente A' : 'Cliente B') : '<span class="nok">NOK</span> · ' + it.defs.join(' + ') + ' → rechazo';
+    li.innerHTML = ok ? '<span class="okk">OK</span> · ' + (it.client === 'CLI_A' ? 'Cliente A' : 'Cliente B') : '<span class="nok">NOK</span> · ' + it.defs.join(' + ') + ' → rechazo';
     elLog.insertBefore(li, elLog.firstChild);
     while (elLog.children.length > 30) elLog.removeChild(elLog.lastChild);
   }
   function renderCounters() {
-    var rows = [['Total inspeccionados', counters.total], ['OK', counters.ok], ['Sin lata (R1)', counters.SIN_LATA], ['Lata corta (R6)', counters.LATA_CORTA], ['Sin tapa (R7)', counters.SIN_TAPA], ['Solapa levantada (R2)', counters.SOLAPA_LEVANTADA], ['Cliente erróneo (R3/R5)', counters.CLIENTE_ERRONEO]];
-    elCnt.innerHTML = '<table>' + rows.map(function (r) { return '<tr><td>' + r[0] + '</td><td class="n"><b>' + r[1] + '</b></td></tr>'; }).join('') + '</table>';
+    var nok = counters.total - counters.ok;
+    var tiles = [['Inspeccionados', counters.total, 'k-navy'], ['Correctos', counters.ok, 'k-ok'], ['Rechazados', nok, 'k-nok'], ['Cadencia', Math.round(speed / 0.12 * 60) + '/min', 'k-blue']];
+    var det = [['Sin lata', counters.SIN_LATA], ['Lata corta', counters.LATA_CORTA], ['Sin tapa', counters.SIN_TAPA], ['Solapa levantada', counters.SOLAPA_LEVANTADA], ['Cliente erróneo', counters.CLIENTE_ERRONEO]];
+    elCnt.innerHTML = tiles.map(function (t) { return '<div class="kpi ' + t[2] + '"><div class="kl">' + t[0] + '</div><div class="kv">' + t[1] + '</div></div>'; }).join('') +
+      '<div class="kdet">' + det.map(function (d) { return '<span>' + d[0] + ' <b>' + d[1] + '</b></span>'; }).join('') + '</div>';
   }
   renderCounters();
 
@@ -1978,7 +1995,7 @@ footer{font-size:12.5px;color:var(--ink2)}
   btnPlay.onclick = function () { playing = !playing; btnPlay.textContent = playing ? '⏸ Pausa' : '▶ Reproducir'; btnPlay.classList.toggle('on', playing); };
   var spd = document.getElementById('spd'), spdTxt = document.getElementById('spdTxt');
   function fmt(n, d) { return n.toFixed(d).replace('.', ','); }
-  function updSpd() { speed = parseFloat(spd.value); spdTxt.textContent = fmt(speed, 2) + ' m/s · ' + Math.round(speed / 0.12 * 60) + ' est/min'; }
+  function updSpd() { speed = parseFloat(spd.value); spdTxt.textContent = fmt(speed, 2) + ' m/s · ' + Math.round(speed / 0.12 * 60) + ' est/min'; renderCounters(); }
   spd.oninput = updSpd; updSpd();
   var tsc = document.getElementById('tsc'), tscTxt = document.getElementById('tscTxt');
   tsc.oninput = function () { timeScale = parseFloat(tsc.value); tscTxt.textContent = '×' + fmt(timeScale, 2); };
