@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Estación de inspección G4</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="description" content="Simulador 3D de la estación de inspección de estuches de sardinas (Grupo 4, Máster en Mecatrónica UVigo).">
+<meta name="description" content="Simulador 3D de una estación de inspección de estuches de latas de conserva.">
 <style>
 /* Disposición: cabecera técnica compacta + visor 3D a todo el ancho + paneles de estado debajo */
 :root{
@@ -76,9 +76,9 @@ footer{font-size:12.5px;color:var(--ink2)}
 <div class="wrap">
 <header class="top">
   <div>
-    <div class="eyebrow">Máster en Mecatrónica · UVigo · Sensores y Actuadores · Grupo 4</div>
+    <div class="eyebrow">Sensores y actuadores · Simulador 3D</div>
     <h1>Estación de inspección de estuches de sardinas</h1>
-    <p>Modelo 3D a escala (mm) de la estación que verifica en línea los estuches de 88 g de ALVA y CALVO: hay lata, la lata no es corta, tiene tapa, las solapas están pegadas, cliente y formato correctos. Elige una fase o provoca un defecto para ver qué sensor lo detecta.</p>
+    <p>Modelo 3D a escala (mm) de la estación que verifica en línea estuches de latas de conserva de dos clientes: hay lata, la lata no es corta, tiene tapa, las solapas están pegadas, cliente y formato correctos. Elige una fase o provoca un defecto para ver qué sensor lo detecta.</p>
   </div>
   <div class="facts">
     <div class="fact"><b>110 × 65 × 25</b>estuche (mm)</div>
@@ -113,7 +113,7 @@ footer{font-size:12.5px;color:var(--ink2)}
       <label class="chk"><input type="checkbox" id="rnd"> aleatorio (15 %)</label>
     </div>
     <div class="grp"><label class="t">Orden activa</label>
-      <button class="b on" data-order="ALVA">ALVA</button><button class="b" data-order="CALVO">CALVO</button>
+      <button class="b on" data-order="ALVA">Cliente A</button><button class="b" data-order="CALVO">Cliente B</button>
     </div>
     <div class="grp"><label class="t">Vista</label>
       <button class="b" id="btnXray">Rayos X</button>
@@ -136,7 +136,7 @@ footer{font-size:12.5px;color:var(--ink2)}
   <div><b>Defectos</b>El siguiente estuche lleva el defecto elegido. Mira el LED del sensor, el rechazo y los contadores.</div>
   <div><b>Rayos X y explosionada</b>Muestran la lata dentro del estuche y todos los sensores alrededor de un único estuche.</div>
 </div>
-<footer>Datos con las medidas reales de la muestra (22/11/2026). Material de la lata pendiente de confirmar (se supone aluminio). Daniel Rubio Prego · 2026 · Three.js r128 (MIT).</footer>
+<footer>Datos con las medidas reales de la muestra (22/11/2026). Material de la lata pendiente de confirmar (se supone aluminio). Three.js r128 (MIT).</footer>
 </div>
 
 <script>
@@ -1558,7 +1558,7 @@ footer{font-size:12.5px;color:var(--ink2)}
       x.fillStyle = '#ffffff'; x.fillRect(0, 0, 1100, 650);
       waves(x, 1100, 20, 470, '#c7ccd2');
       x.fillStyle = '#e8573f'; x.beginPath(); x.moveTo(0, 470); for (var i = 0; i <= 1100; i += 10) x.lineTo(i, 470 + Math.sin(i / 40) * 10); x.lineTo(1100, 650); x.lineTo(0, 650); x.fill();
-      x.fillStyle = '#16264f'; x.font = '900 170px "Arial Black", Arial'; x.textAlign = 'center'; x.fillText('ALVA', 550, 210);
+      x.fillStyle = '#16264f'; x.font = '900 120px "Arial Black", Arial'; x.textAlign = 'center'; x.fillText('CLIENTE A', 550, 210);
       sardine(x, 520, 330, 330);
       x.fillStyle = '#fff'; x.font = 'bold 62px Arial'; x.fillText('SARDINAS “Sardinillas”', 520, 555);
       x.font = '48px Arial'; x.fillText('en Tomate', 520, 615);
@@ -1566,7 +1566,7 @@ footer{font-size:12.5px;color:var(--ink2)}
     } else {
       x.fillStyle = '#e3101c'; x.fillRect(0, 0, 1100, 650);
       x.fillStyle = '#1f63b6'; x.fillRect(0, 0, 1100, 330);
-      x.fillStyle = '#fff'; x.font = 'italic 900 230px "Arial Black", Arial'; x.textAlign = 'center'; x.fillText('Calvo', 500, 260);
+      x.fillStyle = '#fff'; x.font = 'italic 900 150px "Arial Black", Arial'; x.textAlign = 'center'; x.fillText('Cliente B', 500, 250);
       x.font = '44px Arial'; x.fillText('®', 1040, 70);
       x.fillStyle = '#3b0a0a'; x.textAlign = 'left'; x.font = '52px Arial'; x.fillText('Sardinas en', 60, 500);
       x.font = 'bold 56px Arial'; x.fillText('salsa de tomate.', 60, 570);
@@ -1587,7 +1587,7 @@ footer{font-size:12.5px;color:var(--ink2)}
   function makeSide(client) { // laterales largos (110 × 25)
     var c = canvasFor(1100, 250), x = c.getContext('2d');
     x.fillStyle = client === 'ALVA' ? '#e8573f' : '#e3101c'; x.fillRect(0, 0, 1100, 250);
-    x.fillStyle = '#fff'; x.font = '900 70px "Arial Black", Arial'; x.textAlign = 'left'; x.fillText(client === 'ALVA' ? 'ALVA' : 'Calvo', 80, 110);
+    x.fillStyle = '#fff'; x.font = '900 70px "Arial Black", Arial'; x.textAlign = 'left'; x.fillText(client === 'ALVA' ? 'CLIENTE A' : 'Cliente B', 80, 110);
     x.font = 'bold 44px Arial'; x.fillText(client === 'ALVA' ? 'SARDINAS “Sardinillas”' : 'Sardinas en salsa', 480, 120);
     var t = new THREE.CanvasTexture(c); t.anisotropy = 4; return t;
   }
@@ -1905,7 +1905,7 @@ footer{font-size:12.5px;color:var(--ink2)}
     if (ok) counters.ok++; else it.defs.forEach(function (d) { counters[d]++; });
     renderCounters();
     var li = document.createElement('li');
-    li.innerHTML = ok ? '<span class="okk">OK</span> · ' + it.client : '<span class="nok">NOK</span> · ' + it.defs.join(' + ') + ' → rechazo';
+    li.innerHTML = ok ? '<span class="okk">OK</span> · ' + (it.client === 'ALVA' ? 'Cliente A' : 'Cliente B') : '<span class="nok">NOK</span> · ' + it.defs.join(' + ') + ' → rechazo';
     elLog.insertBefore(li, elLog.firstChild);
     while (elLog.children.length > 30) elLog.removeChild(elLog.lastChild);
   }
@@ -1925,7 +1925,7 @@ footer{font-size:12.5px;color:var(--ink2)}
     { n: '2 · R1+R6', cam: [-60, 330, -190], tg: [60, 0, -10], focus: ['r1'], belt: true, txt: '<b>R1 + R6 (X = 60).</b> Dos inductivos E2B-M18KN16 enrasados bajo la banda, a Y = ±48 mm. Ven el fondo de aluminio a 4,7 mm (fondo hundido 3 mm). <b>B1 OR B2</b> = hay lata · <b>B1 AND B2</b> = largo correcto: una lata de 70,7 mm no alcanza los dos sensores. Prueba “Lata corta” con Rayos X.' },
     { n: '3 · R7', cam: [110, 210, 150], tg: [180, 0, 30], focus: ['r7'], txt: '<b>R7 (X = 180).</b> Inductivo M30 no apantallado E2B-M30KN20 a 2 mm sobre el estuche: detecta la tapa (hundida 3 mm) a 5,5 mm. Sin tapa no hay doble cierre: solo queda la pestaña del cuerpo, a 31,5 mm del eje.' },
     { n: '4 · R2', cam: [150, 30, 360], tg: [245, 0, 10], focus: ['r2'], txt: '<b>R2 (X = 240/250).</b> Dos láseres E3AS-HL150 a 45 mm de cada extremo, a Z = 7 mm (la solapa visible tiene la bisagra arriba y el borde libre abajo), inclinados 10°. Medida diferencial S = d₁ + d₂. Borde libre separado &gt; 2,5 mm (2,0 mm en el haz) → NOK.' },
-    { n: '5 · R3', cam: [240, 170, 130], tg: [300, 40, 25], focus: ['r3'], txt: '<b>R3 (X = 300).</b> Fibra coaxial a 10 mm de la cara impresa, inclinada 15°, sobre la zona superior derecha: blanca en ALVA, azul en CALVO. Un estuche volcado (base coral) da “desconocido” → rechazo.' },
+    { n: '5 · R3', cam: [240, 170, 130], tg: [300, 40, 25], focus: ['r3'], txt: '<b>R3 (X = 300).</b> Fibra coaxial a 10 mm de la cara impresa, inclinada 15°, sobre la zona superior derecha: blanca en el cliente A, azul en el cliente B. Un estuche volcado (base coral) da “desconocido” → rechazo.' },
     { n: '6 · R5', cam: [300, -330, -170], tg: [365, -33, -30], focus: ['r5'], belt: true, txt: '<b>R5 (X = 360).</b> El EAN-13 va impreso en la base, así que el lector lo lee desde abajo a través de un hueco de transferencia de 15 mm entre las dos cintas. Compara el código con la receta de la orden activa (50 formatos).' },
     { n: '7 · R8', cam: [360, 260, 150], tg: [430, 40, 20], focus: ['r8'], txt: '<b>R8 (opciones, <span class="pend">P12</span>).</b> F + B: láser superior que mide la altura (lata abombada o estuche aplastado). A: sensor de contraste en la solapa Y+, que comprueba que el lote está impreso (inkjet negro sobre naranja).' },
     { n: '8 · Rechazo', cam: [560, 480, 320], tg: [730, 80, -40], focus: ['rej'], txt: '<b>Rechazo (X = 700) y confirmación (X = 780).</b> Si el registro tiene algún bit de defecto, el soplador expulsa el estuche al contenedor. La barrera de confirmación verifica que ningún NOK siga adelante. <span class="pend">P15</span>' },
